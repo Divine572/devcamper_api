@@ -37,25 +37,25 @@ const bootcampSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please enter an address']
     },
-    location: {
-        // GeoJSON Point
-        type: {
-            type: String,
-            enum: ['Point'],
-            required: true
-        },
-        coordinates: {
-            type: [Number],
-            required: true,
-            index: '2dsphere'
-        },
-        street: String,
-        city: String,
-        state: String,
-        zipCode: String,
-        country: String,
-        formattedAddress: String
-    },
+    // location: {
+    //     // GeoJSON Point
+    //     type: {
+    //         type: String,
+    //         enum: ['Point'],
+    //         required: true
+    //     },
+    //     coordinates: {
+    //         type: [Number],
+    //         required: true,
+    //         index: '2dsphere'
+    //     },
+    //     street: String,
+    //     city: String,
+    //     state: String,
+    //     zipCode: String,
+    //     country: String,
+    //     formattedAddress: String
+    // },
     careers: {
         // Array of strings
         type: [String],
