@@ -8,6 +8,7 @@ dotenv.config({ path: './config/config.env' });
 
 
 const Bootcamp = require('./models/Bootcamp');
+const Course = require('./models/Course');
 
 mongoose.connect(process.env.MONGO_URI, {
     useCreateIndex: true,
