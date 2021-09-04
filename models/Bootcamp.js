@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const slugify = require('slugify');
 const geocoder = require('../utils/geocoder');
 
-const bootcampSchema = new mongoose.Schema({
+const BootcampSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'Name is required'],
@@ -43,12 +43,12 @@ const bootcampSchema = new mongoose.Schema({
         type: {
             type: String,
             enum: ['Point'],
-            required: true
+            // required: true
         },
         coordinates: {
             type: [Number],
-            required: true,
-            index: '2dsphere'
+            // required: true,
+            // index: '2dsphere'
         },
         street: String,
         city: String,
@@ -100,16 +100,19 @@ const bootcampSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
+}, {
+    toJSON: { virtuals: true },
+    toObject: { vituals: true }
 });
 
 // Bootcamp slug for name
-bootcampSchema.pre('save', function(next) {
+BootcampSchema.pre('save', function(next) {
     this.slug = slugify(this.name, { lower: true });
     next();
 });
 
 // Geocode and create location field
-bootcampSchema.pre('save', async function(next) {
+BootcampSchema.pre('save', async function(next) {
     const loc = await geocoder.geocode(this.address);
     this.location = {
         type: 'Point',
@@ -128,7 +131,21 @@ bootcampSchema.pre('save', async function(next) {
     next();
 });
 
+// Cascade delete courses when a bootcamp is deleted
+BootcampSchema.pre('remove', async function (next) {
+    console.log(`Courses removed from bootcamp ${this._id}`)
+    await this.model('Course').deleteMany({ bootcamp: this._id });
+
+    next();
+});
+
+// Reverse populate with virtuals
+BootcampSchema.virtual('courses', {
+    ref: 'Course',
+    localField: '_id',
+    foreignField: 'bootcamp',
+    justOne: false
+})
 
 
-
-module.exports = mongoose.model('Bootcamp', bootcampSchema);
+module.exports = mongoose.model('Bootcamp', BootcampSchema);
