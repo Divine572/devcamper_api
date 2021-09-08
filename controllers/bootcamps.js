@@ -146,13 +146,14 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
     if (!bootcamp) return next(new ErrorResponse(`Bootcamp with the given id ${req.params.id}`, 404));
 
 
-    bootcamp.remove();
+    await bootcamp.remove();
     
     res.json({
         success: true,
-        data: bootcamp
+        data: {}
     });
 });
+
 
 
 
