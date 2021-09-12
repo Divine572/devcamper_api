@@ -17,7 +17,7 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
         query = Course.find({ bootcamp: req.params.bootcampId })
     } else {
         query = Course.find().populate({
-            path: 'bootcamp',
+            path: 'bootcamps',
             select: 'name description'
         });
     }
@@ -113,7 +113,7 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
     if (!course) return next(new ErrorResponse(`No course with the given id ${req.params.id}`, 404));
 
     await course.remove();
-    
+
     res.json({
         success: true,
         data: {}

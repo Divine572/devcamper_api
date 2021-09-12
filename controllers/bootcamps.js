@@ -2,6 +2,7 @@ const Bootcamp = require('../models/Bootcamp');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const geocoder = require('../utils/geocoder');
+const path = require('path');
 
 // @desc        Get all bootcamps
 // @routes      GET /api/v1/bootcamps
@@ -31,7 +32,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
 
     // Finding resource
     query = Bootcamp.find(JSON.parse(queryStr)).populate({
-        path: 'course',
+        path: 'courses',
         select: 'title description'
     });
  
@@ -190,4 +191,36 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
 
 
 
+// @desc        Upload photo for bootcamp
+// @routes      PUT /api/v1/bootcamps/:id/photo
+// @access      Private
+exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
+    const bootcamp = await Bootcamp.findById(req.params.id);
 
+    if (!bootcamp) return next(new ErrorResponse(`Bootcamp with the given id ${req.params.id}`, 404));
+
+
+    if(!req.files.foo) {
+        return next(new ErrorResponse(`Please upload a file`, 400));
+    }
+
+    const file = req.files.foo;
+
+    console.log(file);
+
+    // Check if it's a photo
+    if (!file.mimetype.startsWith('image')) {
+        return next(new ErrorResponse(`Please upload a file`, 400));
+    }
+
+
+    // Check file size
+    if (file.size > process.env.MAX_FILE_UPLOAD) {
+        return next(new ErrorResponse(`Please upload an image less than ${process.env.MAX_FILE_UPLOAD}`, 400));
+    }
+
+    // Create customer filename
+    file.name = `photo_${bootcamp._id}${path.parse(file.name).ext}`;
+
+    console.log(file.name);
+});
